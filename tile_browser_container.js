@@ -90,7 +90,7 @@ class TileBrowserContainer extends React.Component {
                 e(
                     'button',
                     {
-                        onClick: () => this.#moveTile(0, -1 * this.state.moveDistance),
+                        onClick: () => this.moveTile(0, -1 * this.state.moveDistance),
                         disabled: disableUp
                     },
                     'Up'
@@ -98,7 +98,7 @@ class TileBrowserContainer extends React.Component {
                 e(
                     'button',
                     {
-                        onClick: () => this.#moveTile(0, this.state.moveDistance),
+                        onClick: () => this.moveTile(0, this.state.moveDistance),
                         disabled: disableDown
                     },
                     'Down'
@@ -106,7 +106,7 @@ class TileBrowserContainer extends React.Component {
                 e(
                     'button',
                     {
-                        onClick: () => this.#moveTile(-1 * this.state.moveDistance, 0),
+                        onClick: () => this.moveTile(-1 * this.state.moveDistance, 0),
                         disabled: disableLeft
                     },
                     'Left'
@@ -114,7 +114,7 @@ class TileBrowserContainer extends React.Component {
                 e(
                     'button',
                     {
-                        onClick: () => this.#moveTile(this.state.moveDistance, 0),
+                        onClick: () => this.moveTile(this.state.moveDistance, 0),
                         disabled: disableRight
                     },
                     'Right'
