@@ -25,7 +25,7 @@ class TileBrowserContainer extends React.Component {
         };
     }
 
-    #moveTile = (xMovement, yMovement) => {
+    moveTile = (xMovement, yMovement) => {
         if (this.state.moveDistance > this.state.imgWidth) {
             this.state.startX = 0;
             xMovement = 0;
