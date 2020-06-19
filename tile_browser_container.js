@@ -8,6 +8,11 @@ const availableImagesPath = "/v1/image/availableImages";
 const getPropsPath = "/v1/image/props";
 const getPreviewPath = "/v1/image/preview";
 const maxImageSide = 3500;
+const initStartX = 5570;
+const initStartY = 1400;
+const initXLen = 1600;
+const initYLen = 1200;
+const initImageId = 1;
 
 class TileBrowserContainer extends React.Component {
     constructor(props) {
@@ -17,22 +22,22 @@ class TileBrowserContainer extends React.Component {
         this.prevClickY = -1;
         this.dblClickZoomTimer = null;
         this.state = {
-            startX: 0,
-            startY: 0,
-            xLen: 800,
-            yLen: 600,
+            startX: initStartX,
+            startY: initStartY,
+            xLen: initXLen,
+            yLen: initYLen,
             title: "Loading...",
             availableImages: [],
             moveDistance: 350,
             imgWidth: 0,
             imgHeight: 0,
             imgTagWidth: 400,
-            imageId: 1,
+            imageId: initImageId,
             imageLoaded: false,
             previewSize: 300,
             zoomInDisabled: false,
             zoomOutDisabled: false,
-            imageTileUrl: "http://localhost:8080/v1/image/getTile/1/0/400/0/400"
+            imageTileUrl: host + getTilePath + "/" + initImageId + "/" + initStartX + "/" + initXLen + "/" + initStartY + "/" + initYLen
         };
 
         fetch( host + availableImagesPath)
@@ -259,10 +264,10 @@ class TileBrowserContainer extends React.Component {
         }
         newStartX = newStartX - this.state.xLen / 2;
         newStartY = newStartY - this.state.yLen / 2;
-        if (newStartX - newXLen < 0) {
+        if (newStartX < 0) {
             newStartX = 0
         }
-        if (newStartY - newYLen < 0) {
+        if (newStartY < 0) {
             newStartY = 0
         }
         return {
