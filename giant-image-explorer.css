@@ -1,0 +1,27 @@
+button {
+    float: right;
+}
+select {
+    float: right;
+}
+.image-browser-zoom-btn {
+    font-weight:    bold;
+    font-size: 1em;
+    padding: 0.3em;
+}
+canvas {
+    display: block;
+    margin-top: -7.5%;
+    margin-left: 59.4%;
+}
+img {
+    padding-bottom: 0;
+}
+h1 {
+    width: 80%;
+    text-align: center;
+}
+h3 {
+    width: 80%;
+    text-align: center;
+}

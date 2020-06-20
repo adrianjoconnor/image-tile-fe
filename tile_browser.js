@@ -2,45 +2,47 @@
 
 const e = React.createElement;
 
-const host = "http://localhost:8080";
-const getTilePath = "/v1/image/getTile";
-const availableImagesPath = "/v1/image/availableImages";
-const getPropsPath = "/v1/image/props";
-const getPreviewPath = "/v1/image/preview";
-const maxImageSide = 3500;
-const initStartX = 5570;
-const initStartY = 1400;
-const initXLen = 1600;
-const initYLen = 1200;
-const initImageId = 1;
-
-class TileBrowserContainer extends React.Component {
+class ImageTileBrowser extends React.Component {
     constructor(props) {
         super(props);
+        this.host = props.host;
+        this.getTilePath = props.getTilePath;
+        this.availableImagesPath = props.availableImagesPath;
+        this.getPropsPath = props.getPropsPath;
+        this.getPreviewPath = props.getPreviewPath;
+        this.maxImageSide = props.maxImageSide;
+
         this.previewCanvas = React.createRef();
         this.prevClickX = -1;
         this.prevClickY = -1;
         this.dblClickZoomTimer = null;
+
         this.state = {
-            startX: initStartX,
-            startY: initStartY,
-            xLen: initXLen,
-            yLen: initYLen,
+            startX: props.initStartX,
+            startY: props.initStartY,
+            xLen: props.initXLen,
+            yLen: props.initYLen,
             title: "Loading...",
             availableImages: [],
             moveDistance: 350,
             imgWidth: 0,
             imgHeight: 0,
-            imgTagWidth: 400,
-            imageId: initImageId,
+            imgTagWidth: props.initXLen / 2,
+            imageId: props.initImageId,
             imageLoaded: false,
             previewSize: 300,
             zoomInDisabled: false,
             zoomOutDisabled: false,
-            imageTileUrl: host + getTilePath + "/" + initImageId + "/" + initStartX + "/" + initXLen + "/" + initStartY + "/" + initYLen
+            imageTileUrl: this.host
+                + this.getTilePath
+                + "/" + props.initImageId
+                + "/" + props.initStartX
+                + "/" + props.initXLen
+                + "/" + props.initStartY
+                + "/" + props.initYLen
         };
 
-        fetch( host + availableImagesPath)
+        fetch( this.host + this.availableImagesPath)
             .then(res => res.json())
             .then((data) => {
                 this.setState({ availableImages: data })
@@ -51,7 +53,7 @@ class TileBrowserContainer extends React.Component {
                 let previewSize = this.state.previewSize;
                 this.setState({imageId: imageId});
 
-                fetch( host + getPropsPath + "/" + imageId)
+                fetch( this.host + this.getPropsPath + "/" + imageId)
                     .then(res => res.json())
                     .then((data) => {
                         this.setState({
@@ -157,7 +159,7 @@ class TileBrowserContainer extends React.Component {
 
         this.setState(
             {
-                imageTileUrl: host + getTilePath + "/" + this.state.imageId + "/" + coOrds.newStartX + "/" + coOrds.newXLen + "/" + coOrds.newStartY + "/" + coOrds.newYLen,
+                imageTileUrl: this.host + this.getTilePath + "/" + this.state.imageId + "/" + coOrds.newStartX + "/" + coOrds.newXLen + "/" + coOrds.newStartY + "/" + coOrds.newYLen,
                 startX: coOrds.newStartX,
                 startY: coOrds.newStartY,
                 xLen: coOrds.newXLen,
@@ -230,7 +232,7 @@ class TileBrowserContainer extends React.Component {
 
     setZoomInState(params) {
         this.setState({
-            imageTileUrl: host + getTilePath + "/" + this.state.imageId + "/" + params.startX + "/" + params.xLen + "/" + params.startY + "/" + params.yLen,
+            imageTileUrl: this.host + this.getTilePath + "/" + this.state.imageId + "/" + params.startX + "/" + params.xLen + "/" + params.startY + "/" + params.yLen,
             xLen: params.xLen,
             yLen: params.yLen,
             startX: params.startX,
@@ -254,8 +256,8 @@ class TileBrowserContainer extends React.Component {
         let zoomOutDisabled =
             this.state.xLen * 4 > this.state.imgWidth
             || this.state.yLen * 4 > this.state.imgHeight
-            || this.state.xLen * 2 > maxImageSide
-            || this.state.yLen * 2 > maxImageSide;
+            || this.state.xLen * 2 > this.maxImageSide
+            || this.state.yLen * 2 > this.maxImageSide;
         if (newStartX + newXLen > this.state.imgWidth) {
             newStartX = this.state.imgWidth - newXLen;
         }
@@ -281,7 +283,7 @@ class TileBrowserContainer extends React.Component {
 
     setZoomOutState(params) {
         this.setState({
-            imageTileUrl: host + getTilePath + "/" + this.state.imageId + "/" + params.startX + "/" + params.xLen + "/" + params.startY + "/" + params.yLen,
+            imageTileUrl: this.host + this.getTilePath + "/" + this.state.imageId + "/" + params.startX + "/" + params.xLen + "/" + params.startY + "/" + params.yLen,
             xLen: params.xLen,
             yLen: params.yLen,
             startX: params.startX,
@@ -294,7 +296,7 @@ class TileBrowserContainer extends React.Component {
 
     switchImage(event) {
         let imageId = event.target.value;
-        fetch( host + getPropsPath + "/" + imageId)
+        fetch( this.host + this.getPropsPath + "/" + imageId)
             .then(res => res.json())
             .then((data) => {
                 this.setState({
@@ -311,7 +313,7 @@ class TileBrowserContainer extends React.Component {
     }
 
     updatePreviewImage() {
-        fetch( host + getPreviewPath + "/" + this.state.imageId + "/" + this.state.previewSize)
+        fetch( this.host + this.getPreviewPath + "/" + this.state.imageId + "/" + this.state.previewSize)
             .then(res => res.blob())
             .then((resBlob => resBlob.arrayBuffer()))
             .then((data) => {
@@ -458,20 +460,22 @@ class TileBrowserContainer extends React.Component {
                 e(
                     'button',
                     {
-                        onClick: () => this.zoomIn(),
-                        disabled: this.state.zoomInDisabled,
-                        alt: "Zoom In"
+                        onClick: () => this.zoomOut(),
+                        disabled: this.state.zoomOutDisabled,
+                        class: "image-browser-zoom-btn",
+                        alt: "Zoom Out"
                     },
-                    '+'
+                    '-'
                 ),
                 e(
                     'button',
                     {
-                        onClick: () => this.zoomOut(),
-                        disabled: this.state.zoomOutDisabled,
-                        alt: "Zoom Out"
+                        onClick: () => this.zoomIn(),
+                        disabled: this.state.zoomInDisabled,
+                        class: "image-browser-zoom-btn",
+                        alt: "Zoom In"
                     },
-                    '-'
+                    '+'
                 ),
                 e("canvas", {
                     ref: this.previewCanvas,
@@ -490,5 +494,4 @@ class TileBrowserContainer extends React.Component {
     }
 }
 
-const domContainer = document.querySelector('#tile_browser_container');
-ReactDOM.render(e(TileBrowserContainer), domContainer);
+export default ImageTileBrowser;
