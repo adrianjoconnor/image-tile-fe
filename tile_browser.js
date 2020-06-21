@@ -33,6 +33,9 @@ class ImageTileBrowser extends React.Component {
             previewSize: 300,
             zoomInDisabled: false,
             zoomOutDisabled: false,
+            prevDeltaY: 0,
+            pinchZoomDisable: false,
+            previewHidden: false,
             imageTileUrl: this.host
                 + this.getTilePath
                 + "/" + props.initImageId
@@ -71,6 +74,26 @@ class ImageTileBrowser extends React.Component {
 
     componentWillMount() {
         document.addEventListener("keydown", this.handleKeyDown.bind(this));
+        document.addEventListener('wheel', this.handleTrackpadPinch.bind(this));
+    }
+
+    handleTrackpadPinch(e) {
+        e.preventDefault();
+        if (e.ctrlKey && !this.state.pinchZoomDisable) {
+            if (((e.deltaY < 0 && this.state.prevDeltaY >= 0)
+                || (e.deltaY < 0 && e.deltaY + this.state.prevDeltaY < -10))
+                && !this.state.zoomInDisabled) {
+                this.state.pinchZoomDisable = true;
+                this.zoomIn();
+                setTimeout(() => {this.state.pinchZoomDisable = false;}, 500);
+            } else if (((e.deltaY > 0 && this.state.prevDeltaY <= 0)
+                || (e.deltaY > 0 && e.deltaY - this.state.prevDeltaY > 10))
+                && !this.state.zoomOutDisabled) {
+                this.state.pinchZoomDisable = true;
+                this.zoomOut();
+                setTimeout(() => {this.state.pinchZoomDisable = false;}, 500);
+            }
+        }
     }
 
     moveInDirection = (xMovement, yMovement) => {
@@ -117,8 +140,6 @@ class ImageTileBrowser extends React.Component {
                     this.dblClickZoomTimer = null;
                 }, 250);
             }
-
-            console.log("X: " + x + ", Y: " + y);
         }
 
         this.prevClickX = x;
@@ -191,10 +212,10 @@ class ImageTileBrowser extends React.Component {
         }
 
         return {
-            newStartX: newStartX,
-            newStartY: newStartY,
-            newXLen: newXLen,
-            newYLen: newYLen
+            newStartX: Math.floor(newStartX),
+            newStartY: Math.floor(newStartY),
+            newXLen: Math.floor(newXLen),
+            newYLen: Math.floor(newYLen)
         }
     }
 
@@ -222,10 +243,10 @@ class ImageTileBrowser extends React.Component {
         }
         let zoomInDisabled = this.state.xLen / 2 < this.state.imgTagWidth;
         return {
-            xLen: newXLen,
-            yLen: newYLen,
-            startX: newStartX,
-            startY: newStartY,
+            xLen: Math.floor(newXLen),
+            yLen: Math.floor(newYLen),
+            startX: Math.floor(newStartX),
+            startY: Math.floor(newStartY),
             zoomInDisabled: zoomInDisabled
         }
     }
@@ -273,10 +294,10 @@ class ImageTileBrowser extends React.Component {
             newStartY = 0
         }
         return {
-            xLen: newXLen,
-            yLen: newYLen,
-            startX: newStartX,
-            startY: newStartY,
+            xLen: Math.floor(newXLen),
+            yLen: Math.floor(newYLen),
+            startX: Math.floor(newStartX),
+            startY: Math.floor(newStartY),
             zoomOutDisabled: zoomOutDisabled
         }
     }
@@ -312,6 +333,14 @@ class ImageTileBrowser extends React.Component {
             .catch(console.log)
     }
 
+    togglePreviewVisibility(e) {
+        if (e.target.checked) {
+            this.setState({previewHidden: false});
+        } else {
+            this.setState({previewHidden: true});
+        }
+    }
+
     updatePreviewImage() {
         fetch( this.host + this.getPreviewPath + "/" + this.state.imageId + "/" + this.state.previewSize)
             .then(res => res.blob())
@@ -328,7 +357,7 @@ class ImageTileBrowser extends React.Component {
 
                     img.onload = () => {
                         component.state.previewImage = img;
-                        component.redrawPreview(component);
+                        component.redrawPreview();
                     }
                 };
 
@@ -337,21 +366,21 @@ class ImageTileBrowser extends React.Component {
             .catch(console.log);
     }
 
-    redrawPreview(component) {
-        if (component.state.previewImage !== null && component.state.previewImage !== undefined) {
-            let previewImg = component.state.previewImage;
+    redrawPreview() {
+        if (this.state.previewImage !== null && this.state.previewImage !== undefined) {
+            let previewImg = this.state.previewImage;
 
-            let canvas = component.previewCanvas.current;
+            let canvas = this.previewCanvas.current;
             let ctx = canvas.getContext("2d");
 
             canvas.width = previewImg.width;
             canvas.height = previewImg.height;
             ctx.drawImage(previewImg, 0, 0);
 
-            let x = Math.floor((component.state.startX / component.state.imgWidth) * previewImg.width);
-            let y = Math.floor((component.state.startY / component.state.imgHeight) * previewImg.height);
-            let w = Math.floor((component.state.xLen / component.state.imgWidth) * previewImg.width);
-            let h = Math.floor((component.state.yLen / component.state.imgHeight) * previewImg.height);
+            let x = Math.floor((this.state.startX / this.state.imgWidth) * previewImg.width);
+            let y = Math.floor((this.state.startY / this.state.imgHeight) * previewImg.height);
+            let w = Math.floor((this.state.xLen / this.state.imgWidth) * previewImg.width);
+            let h = Math.floor((this.state.yLen / this.state.imgHeight) * previewImg.height);
 
             ctx.fillStyle = "rgba(44, 157, 255, 0.6)";
             ctx.fillRect(x, y, w, h);
@@ -477,9 +506,16 @@ class ImageTileBrowser extends React.Component {
                     },
                     '+'
                 ),
+                e("input", {
+                    type: "checkbox",
+                    name: "show-preview-check",
+                    checked: !this.state.previewHidden,
+                    onChange: (e) => this.togglePreviewVisibility(e)
+                }),
                 e("canvas", {
                     ref: this.previewCanvas,
                     title: "Click to move",
+                    display: this.state.previewHidden ? "none": null,
                     onClick: (e) => this.handlePreviewClick(e),
                     onDoubleClick: (e) => e.preventDefault(),
                     onKeyDown: (e) => this.handleKeyDown(e)
@@ -490,7 +526,7 @@ class ImageTileBrowser extends React.Component {
     }
 
     componentDidUpdate() {
-        this.redrawPreview(this);
+        this.redrawPreview();
     }
 }
 

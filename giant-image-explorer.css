@@ -13,6 +13,7 @@ canvas {
     display: block;
     margin-top: -7.5%;
     margin-left: 59.4%;
+    border: 3px groove lightgreen;
 }
 img {
     padding-bottom: 0;
@@ -20,8 +21,14 @@ img {
 h1 {
     width: 80%;
     text-align: center;
+    font-family: Courier, monospace;
 }
 h3 {
     width: 80%;
     text-align: center;
+    font-family: Courier, monospace;
+}
+body {
+    background: rgb(9,145,46);
+    background: linear-gradient(180deg, rgba(9,145,46,0.1) 22%, rgba(2,199,23,0.25) 77%);
 }
