@@ -16,6 +16,10 @@ In a separate terminal, cd to the directory containing your copy of image-tile-f
 
 `cd image-tile-fe`
 
-And then run this (requires npm) `npm run serve`
+run npm install (requires npm)
+
+`npm install`
+
+And then run this `npm run serve`
 
 Then open your browser and go to http://localhost:8081 and you it should all be running.
