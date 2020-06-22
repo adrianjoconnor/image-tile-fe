@@ -22,4 +22,4 @@ run npm install (requires npm)
 
 And then run this `npm run serve`
 
-Then open your browser and go to http://localhost:8081 and you it should all be running.
+Then open your browser and go to http://localhost:8081 and it should all be running.
