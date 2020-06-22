@@ -1,13 +1,6 @@
-button {
-    float: right;
-}
-select {
-    float: right;
-}
 .image-browser-zoom-btn {
     font-weight:    bold;
-    font-size: 1em;
-    padding: 0.3em;
+    display: block;
 }
 canvas {
     display: block;
@@ -27,6 +20,20 @@ h3 {
     width: 80%;
     text-align: center;
     font-family: Courier, monospace;
+}
+.zoom-buttons {
+    margin-top: -40%;
+    margin-left: 78%;
+    position: absolute;
+}
+.right-panel {
+    float: right;
+    width: 18%;
+}
+.keyboard-shortcuts-panel {
+    background-color: bisque;
+    border: 3px groove lightgreen;
+    width: 80%;
 }
 body {
     background: rgb(9,145,46);

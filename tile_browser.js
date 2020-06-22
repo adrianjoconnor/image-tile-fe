@@ -36,6 +36,8 @@ class ImageTileBrowser extends React.Component {
             prevDeltaY: 0,
             pinchZoomDisable: false,
             previewHidden: false,
+            zoomButtonsHidden: false,
+            shortcutsHidden: true,
             imageTileUrl: this.host
                 + this.getTilePath
                 + "/" + props.initImageId
@@ -334,11 +336,16 @@ class ImageTileBrowser extends React.Component {
     }
 
     togglePreviewVisibility(e) {
-        if (e.target.checked) {
-            this.setState({previewHidden: false});
-        } else {
-            this.setState({previewHidden: true});
-        }
+        this.setState({previewHidden: !e.target.checked});
+    }
+
+    toggleZoomButtonVisibility(e) {
+        this.setState({zoomButtonsHidden: !e.target.checked});
+    }
+
+    toggleShortcutsVisibility(e) {
+        e.preventDefault();
+        this.setState({shortcutsHidden: !this.state.shortcutsHidden});
     }
 
     updatePreviewImage() {
@@ -447,75 +454,184 @@ class ImageTileBrowser extends React.Component {
                     }
                 ),
                 e(
-                    'select',
+                    "div",
                     {
-                        value: this.state.imageId,
-                        onChange: (event) => this.switchImage(event)
+                        class: "zoom-buttons",
+                        style: {
+                            display: this.state.zoomButtonsHidden ? "none": ""
+                        },
                     },
-                    availableImageElements
+                    [
+                        e(
+                            'button',
+                            {
+                                onClick: () => this.zoomIn(),
+                                disabled: this.state.zoomInDisabled,
+                                class: "image-browser-zoom-btn",
+                                alt: "Zoom In"
+                            },
+                            '+'
+                        ),
+                        e(
+                            'button',
+                            {
+                                onClick: () => this.zoomOut(),
+                                disabled: this.state.zoomOutDisabled,
+                                class: "image-browser-zoom-btn",
+                                alt: "Zoom Out"
+                            },
+                            '-'
+                        )
+                    ]
                 ),
-                e(
-                    'button',
+                e("div",
                     {
-                        onClick: () => this.moveInDirection(0, -1 * this.state.moveDistance),
-                        disabled: disableUp
+                        class: "right-panel"
                     },
-                    'Up'
+                    [
+                        e(
+                            'select',
+                            {
+                                value: this.state.imageId,
+                                onChange: (event) => this.switchImage(event)
+                            },
+                            availableImageElements
+                        ),
+                        e(
+                            "br",
+                            {}
+                        ),
+                        e(
+                            "div",
+                            {
+                                style: {
+                                    position: "relative",
+                                    width: "100%",
+                                    "margin-bottom": "4em",
+                                    "margin-top": "0.5em"
+                                }
+                            },
+                            [
+                                e(
+                                    'button',
+                                    {
+                                        onClick: () => this.moveInDirection(0, -1 * this.state.moveDistance),
+                                        disabled: disableUp,
+                                        style: {
+                                            position: "absolute",
+                                            top: "0",
+                                            left: "3.2em"
+                                        }
+                                    },
+                                    '↑'
+                                ),
+                                e(
+                                    'button',
+                                    {
+                                        onClick: () => this.moveInDirection(0, this.state.moveDistance),
+                                        disabled: disableDown,
+                                        style: {
+                                            position: "absolute",
+                                            top: "3.8em",
+                                            left: "3.2em"
+                                        }
+                                    },
+                                    '↓'
+                                ),
+                                e(
+                                    'button',
+                                    {
+                                        onClick: () => this.moveInDirection(-1 * this.state.moveDistance, 0),
+                                        disabled: disableLeft,
+                                        style: {
+                                            position: "absolute",
+                                            top: "1.9em",
+                                            left: "0"
+                                        }
+                                    },
+                                    '←'
+                                ),
+                                e(
+                                    'button',
+                                    {
+                                        onClick: () => this.moveInDirection(this.state.moveDistance, 0),
+                                        disabled: disableRight,
+                                        style: {
+                                            position: "absolute",
+                                            top: "1.9em",
+                                            left: "6em"
+                                        }
+                                    },
+                                    '→'
+                                )
+                            ]
+                        ),
+                        e(
+                            "br",
+                            {}
+                        ),
+                        e("label",
+                            {
+                                for: "show-preview-check"
+                            },
+                            "Show preview"
+                        ),
+                        e("input", {
+                            type: "checkbox",
+                            name: "show-preview-check",
+                            checked: !this.state.previewHidden,
+                            onChange: (e) => this.togglePreviewVisibility(e)
+                        }),
+                        e(
+                            "br",
+                            {}
+                        ),
+                        e("label",
+                            {
+                                for: "show-zoom-buttons-check"
+                            },
+                            "Show zoom buttons"
+                        ),
+                        e("input", {
+                            type: "checkbox",
+                            name: "show-zoom-buttons-check",
+                            checked: !this.state.zoomButtonsHidden,
+                            onChange: (e) => this.toggleZoomButtonVisibility(e)
+                        }),
+                        e(
+                            "br",
+                            {}
+                        ),
+                        e("span",
+                            {
+                                onClick: (e) => this.toggleShortcutsVisibility(e),
+                                style: {
+                                    "text-decoration": "underline"
+                                }
+                            },
+                            "Keyboard shortcuts"
+                        ),
+                        e("div",
+                            {
+                                style: {
+                                    display: this.state.shortcutsHidden ? "none": ""
+                                },
+                                class: "keyboard-shortcuts-panel"
+                            },
+                            [
+                                e(
+                                    "p",
+                                    {},
+                                    "↑, ↓, ←, → arrows: Move", e("br", null), "W, S, A, D: Move", e("br", null), "Numpad -/+: Zoom in/out", e("br", null), "-/+(Shift and =): Zoom in/out"
+                                )
+                            ]
+                        )
+                    ]
                 ),
-                e(
-                    'button',
-                    {
-                        onClick: () => this.moveInDirection(0, this.state.moveDistance),
-                        disabled: disableDown
-                    },
-                    'Down'
-                ),
-                e(
-                    'button',
-                    {
-                        onClick: () => this.moveInDirection(-1 * this.state.moveDistance, 0),
-                        disabled: disableLeft
-                    },
-                    'Left'
-                ),
-                e(
-                    'button',
-                    {
-                        onClick: () => this.moveInDirection(this.state.moveDistance, 0),
-                        disabled: disableRight
-                    },
-                    'Right'
-                ),
-                e(
-                    'button',
-                    {
-                        onClick: () => this.zoomOut(),
-                        disabled: this.state.zoomOutDisabled,
-                        class: "image-browser-zoom-btn",
-                        alt: "Zoom Out"
-                    },
-                    '-'
-                ),
-                e(
-                    'button',
-                    {
-                        onClick: () => this.zoomIn(),
-                        disabled: this.state.zoomInDisabled,
-                        class: "image-browser-zoom-btn",
-                        alt: "Zoom In"
-                    },
-                    '+'
-                ),
-                e("input", {
-                    type: "checkbox",
-                    name: "show-preview-check",
-                    checked: !this.state.previewHidden,
-                    onChange: (e) => this.togglePreviewVisibility(e)
-                }),
                 e("canvas", {
                     ref: this.previewCanvas,
                     title: "Click to move",
-                    display: this.state.previewHidden ? "none": null,
+                    style: {display: this.state.previewHidden ? "none": ""},
                     onClick: (e) => this.handlePreviewClick(e),
                     onDoubleClick: (e) => e.preventDefault(),
                     onKeyDown: (e) => this.handleKeyDown(e)
