@@ -1,0 +1,10 @@
+{
+  "name": "@adrianjoconnor/imagetilefe",
+  "version": "1.0.0",
+  "dependencies": {
+    "http-server": "^0.12.3"
+  },
+  "scripts": {
+    "serve": "http-server ."
+  }
+}

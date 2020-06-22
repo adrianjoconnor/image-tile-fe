@@ -490,9 +490,17 @@ class ImageTileBrowser extends React.Component {
                     },
                     [
                         e(
+                            'label',
+                            {
+                                for: "select-image"
+                            },
+                            "Select Image:"
+                        ),
+                        e(
                             'select',
                             {
                                 value: this.state.imageId,
+                                name: "select-image",
                                 onChange: (event) => this.switchImage(event)
                             },
                             availableImageElements
@@ -634,7 +642,6 @@ class ImageTileBrowser extends React.Component {
                     style: {display: this.state.previewHidden ? "none": ""},
                     onClick: (e) => this.handlePreviewClick(e),
                     onDoubleClick: (e) => e.preventDefault(),
-                    onKeyDown: (e) => this.handleKeyDown(e)
                 })
             ];
         }
