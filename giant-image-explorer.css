@@ -1,6 +1,7 @@
 .image-browser-zoom-btn {
     font-weight:    bold;
     display: block;
+    width: 2em;
 }
 canvas {
     display: block;
@@ -10,6 +11,7 @@ canvas {
 }
 img {
     padding-bottom: 0;
+    border: 2px groove lightgreen;
 }
 h1 {
     width: 80%;

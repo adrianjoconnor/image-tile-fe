@@ -614,7 +614,8 @@ class ImageTileBrowser extends React.Component {
                             {
                                 onClick: (e) => this.toggleShortcutsVisibility(e),
                                 style: {
-                                    "text-decoration": "underline"
+                                    "text-decoration": "underline",
+                                    cursor: "pointer"
                                 }
                             },
                             "Keyboard shortcuts"
