@@ -19,8 +19,8 @@ ReactDOM.render(e(ImageTileBrowser, {
     getPropsPath: "/v1/image/props",
     getPreviewPath: "/v1/image/preview",
     maxImageSide: 3500,
-    initStartX: 5570,
-    initStartY: 1400,
+    initStartX: 5944,
+    initStartY: 142,
     initXLen: initXLen,
     initYLen: initYLen,
     initImageId: 1
